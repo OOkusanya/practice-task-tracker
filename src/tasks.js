@@ -95,3 +95,22 @@ export function openTasksByPriority(tasks, limit = Infinity) {
     .toSorted((a, b) => PRIORITIES.indexOf(a.priority) - PRIORITIES.indexOf(b.priority))
     .slice(0, limit)
 }
+
+export const TASK_FILTERS = [
+  { id: 'all', label: 'All' },
+  { id: 'open', label: 'Open' },
+  { id: 'completed', label: 'Completed' },
+  { id: 'high', label: 'High priority' },
+]
+
+const FILTER_TESTS = {
+  all: () => true,
+  open: (task) => !task.completed,
+  completed: (task) => task.completed,
+  // All high-priority tasks, open or completed.
+  high: (task) => task.priority === 'high',
+}
+
+export function filterTasks(tasks, filter) {
+  return tasks.filter(FILTER_TESTS[filter] ?? FILTER_TESTS.all)
+}

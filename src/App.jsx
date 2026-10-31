@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import About from './About.jsx'
 import {
   OverviewCards,
   PracticeActivity,
@@ -9,18 +10,20 @@ import { MenuIcon } from './icons.jsx'
 import Sidebar from './Sidebar.jsx'
 import TaskTracker from './TaskTracker.jsx'
 import { PRACTICE_NAME } from './demoData.js'
-import { createTask, loadTasks, saveTasks, taskSummary, titleError } from './tasks.js'
+import { EXAMPLE_TASKS, createTask, loadTasks, saveTasks, taskSummary, titleError } from './tasks.js'
 
 const TODAY = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })
 
 const VIEWS = {
   dashboard: { title: 'Dashboard', page: 'Dashboard · Willow Therapy & Wellness' },
   tasks: { title: 'Tasks', page: 'Tasks · Willow Therapy & Wellness' },
+  about: { title: 'About this demo', page: 'About this demo · Willow Therapy & Wellness' },
 }
 
-// The two built pages are switched with the address hash (#tasks), so the browser Back button works.
+// Pages are switched with the address hash (#tasks, #about), so the browser Back button works.
 function viewFromHash() {
-  return window.location.hash === '#tasks' ? 'tasks' : 'dashboard'
+  const view = window.location.hash.slice(1)
+  return view in VIEWS ? view : 'dashboard'
 }
 
 export default function App() {
@@ -73,6 +76,10 @@ export default function App() {
     setTasks((current) => current.filter((task) => task.id !== id))
   }
 
+  function resetTasks() {
+    setTasks(EXAMPLE_TASKS)
+  }
+
   return (
     <div className="layout">
       <Sidebar view={view} open={menuOpen} onClose={() => setMenuOpen(false)} />
@@ -97,7 +104,11 @@ export default function App() {
           <span className="topbar-date">{TODAY}</span>
         </header>
 
-        {view === 'tasks' ? (
+        {view === 'about' ? (
+          <main className="content">
+            <About />
+          </main>
+        ) : view === 'tasks' ? (
           <main className="content">
             <TaskTracker
               tasks={tasks}
@@ -106,6 +117,7 @@ export default function App() {
               onToggle={toggleTask}
               onChangePriority={changePriority}
               onDelete={deleteTask}
+              onReset={resetTasks}
             />
           </main>
         ) : (

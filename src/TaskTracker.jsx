@@ -1,13 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
 import { PlusIcon, TrashIcon } from './icons.jsx'
+import Modal from './Modal.jsx'
 import {
   DEFAULT_PRIORITY,
+  EXAMPLE_TASKS,
   PRIORITIES,
   PRIORITY_LABELS,
+  TASK_FILTERS,
   TITLE_MAX_LENGTH,
+  filterTasks,
   titleError,
   titleLength,
 } from './tasks.js'
+
+const EMPTY_FILTER_MESSAGES = {
+  open: 'No open tasks. Everything is done.',
+  completed: 'No completed tasks yet.',
+  high: 'No high-priority tasks.',
+}
 
 function PriorityOptions() {
   return PRIORITIES.map((priority) => (
@@ -106,7 +116,36 @@ function Metric({ label, value, detail, tone }) {
   )
 }
 
-function TaskOverview({ summary }) {
+function ResetConfirm({ taskCount, onConfirm, onClose }) {
+  return (
+    <Modal
+      title="Reset demo tasks?"
+      titleId="reset-title"
+      className="confirm-modal"
+      onClose={onClose}
+      footer={
+        <>
+          <button type="button" className="button-secondary" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="button" className="button-danger" onClick={onConfirm}>
+            Reset tasks
+          </button>
+        </>
+      }
+    >
+      <p className="modal-text">
+        This replaces the {taskCount} {taskCount === 1 ? 'task' : 'tasks'} saved in this browser with the{' '}
+        {EXAMPLE_TASKS.length} original sample tasks and priorities.
+      </p>
+      <p className="modal-text">
+        Any tasks you added, edited, completed, or deleted will be lost. This can&apos;t be undone.
+      </p>
+    </Modal>
+  )
+}
+
+function TaskOverview({ summary, onResetClick }) {
   const maxOpen = Math.max(1, ...PRIORITIES.map((priority) => summary.openByPriority[priority]))
 
   return (
@@ -147,13 +186,22 @@ function TaskOverview({ summary }) {
         })}
       </ul>
 
-      <p className="overview-note">Tasks are saved in this browser only.</p>
+      <div className="overview-note">
+        <p>Tasks are saved in this browser only.</p>
+        <button type="button" className="link-button" onClick={onResetClick}>
+          Reset demo tasks
+        </button>
+      </div>
     </aside>
   )
 }
 
-export default function TaskTracker({ tasks, summary, onAdd, onToggle, onChangePriority, onDelete }) {
+export default function TaskTracker({ tasks, summary, onAdd, onToggle, onChangePriority, onDelete, onReset }) {
   const [formOpen, setFormOpen] = useState(false)
+  const [filter, setFilter] = useState('all')
+  const [confirmingReset, setConfirmingReset] = useState(false)
+  const visibleTasks = filterTasks(tasks, filter)
+  const filterLabel = TASK_FILTERS.find((option) => option.id === filter).label
   const newTaskButtonRef = useRef(null)
 
   function closeForm() {
@@ -194,15 +242,39 @@ export default function TaskTracker({ tasks, summary, onAdd, onToggle, onChangeP
 
           <section className="card task-panel" aria-labelledby="tasks-title">
             <div className="card-header">
-              <h2 id="tasks-title">All tasks</h2>
-              <span className="card-sub">{tasks.length} total</span>
+              <h2 id="tasks-title">Tasks</h2>
+              <span className="card-sub" aria-live="polite">
+                Showing {visibleTasks.length} of {tasks.length}
+              </span>
+            </div>
+
+            <div className="filters" role="group" aria-label="Filter tasks">
+              {TASK_FILTERS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={option.id === filter ? 'filter active' : 'filter'}
+                  aria-pressed={option.id === filter}
+                  onClick={() => setFilter(option.id)}
+                >
+                  {option.label}
+                  <span className="filter-count">{filterTasks(tasks, option.id).length}</span>
+                </button>
+              ))}
             </div>
 
             {tasks.length === 0 ? (
               <p className="empty">No tasks yet. Use New task to add one.</p>
+            ) : visibleTasks.length === 0 ? (
+              <p className="empty">
+                {EMPTY_FILTER_MESSAGES[filter]}{' '}
+                <button type="button" className="link-button" onClick={() => setFilter('all')}>
+                  Show all tasks
+                </button>
+              </p>
             ) : (
-              <ul className="task-list">
-                {tasks.map((task) => (
+              <ul className="task-list" aria-label={`${filterLabel} tasks`}>
+                {visibleTasks.map((task) => (
                   <li key={task.id} className={task.completed ? 'task done' : 'task'}>
                     <label className="task-label">
                       <input type="checkbox" checked={task.completed} onChange={() => onToggle(task.id)} />
@@ -234,8 +306,20 @@ export default function TaskTracker({ tasks, summary, onAdd, onToggle, onChangeP
           </section>
         </div>
 
-        <TaskOverview summary={summary} />
+        <TaskOverview summary={summary} onResetClick={() => setConfirmingReset(true)} />
       </div>
+
+      {confirmingReset && (
+        <ResetConfirm
+          taskCount={tasks.length}
+          onClose={() => setConfirmingReset(false)}
+          onConfirm={() => {
+            onReset()
+            setFilter('all')
+            setConfirmingReset(false)
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -7,6 +7,7 @@ import {
   TITLE_MAX_LENGTH,
   completionPercent,
   createTask,
+  filterTasks,
   loadTasks,
   openTasksByPriority,
   saveTasks,
@@ -104,6 +105,27 @@ describe('openTasksByPriority', () => {
 
   it('respects the limit', () => {
     expect(openTasksByPriority(tasks, 2).map((task) => task.id)).toEqual(['d', 'c'])
+  })
+})
+
+describe('filterTasks', () => {
+  const tasks = [
+    { id: 'a', completed: false, priority: 'high' },
+    { id: 'b', completed: true, priority: 'high' },
+    { id: 'c', completed: false, priority: 'low' },
+    { id: 'd', completed: true, priority: 'medium' },
+  ]
+  const ids = (filter) => filterTasks(tasks, filter).map((task) => task.id)
+
+  it('filters by status and priority, keeping list order', () => {
+    expect(ids('all')).toEqual(['a', 'b', 'c', 'd'])
+    expect(ids('open')).toEqual(['a', 'c'])
+    expect(ids('completed')).toEqual(['b', 'd'])
+    expect(ids('high')).toEqual(['a', 'b'])
+  })
+
+  it('treats an unknown filter as All', () => {
+    expect(ids('archived')).toEqual(['a', 'b', 'c', 'd'])
   })
 })
 

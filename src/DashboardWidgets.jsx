@@ -6,7 +6,9 @@ import {
   TODAYS_APPOINTMENTS,
   appointmentSummary,
 } from './demoData.js'
+import { useState } from 'react'
 import { AlertIcon, CheckIcon, PinIcon, VideoIcon } from './icons.jsx'
+import Modal from './Modal.jsx'
 import { PRIORITY_LABELS, openTasksByPriority } from './tasks.js'
 
 const APPOINTMENTS = appointmentSummary(TODAYS_APPOINTMENTS)
@@ -106,7 +108,76 @@ function StatusBadge({ status }) {
   )
 }
 
+function AppointmentDetails({ appt, onClose }) {
+  return (
+    <Modal
+      title="Appointment details"
+      titleId="appt-details-title"
+      className="appt-modal"
+      onClose={onClose}
+      footer={
+        <>
+          <p className="modal-note">
+            Read-only demo data. Scheduling and editing appointments are planned, not part of this demo.
+          </p>
+          <button type="button" className="button-secondary" onClick={onClose}>
+            Close
+          </button>
+        </>
+      }
+    >
+      <div className="detail-hero">
+        <span className="avatar avatar-lg" aria-hidden="true">
+          {appt.client.replaceAll('.', '')}
+        </span>
+        <div>
+          <span className="detail-client">Client {appt.client}</span>
+          <span className="detail-when">Today · {appt.time}</span>
+        </div>
+        <StatusBadge status={appt.status} />
+      </div>
+
+      <dl className="detail-list">
+        <div>
+          <dt>Time</dt>
+          <dd>Today, {appt.time}</dd>
+        </div>
+        <div>
+          <dt>Client</dt>
+          <dd>{appt.client} (initials only)</dd>
+        </div>
+        <div>
+          <dt>Clinician</dt>
+          <dd>{appt.clinician}</dd>
+        </div>
+        <div>
+          <dt>Session type</dt>
+          <dd>{appt.type}</dd>
+        </div>
+        <div>
+          <dt>Duration</dt>
+          <dd>{appt.length}</dd>
+        </div>
+        <div>
+          <dt>Location / mode</dt>
+          <dd className="detail-mode">
+            {appt.mode === 'Telehealth' ? <VideoIcon /> : <PinIcon />}
+            {appt.mode}
+          </dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd>{APPOINTMENT_STATUSES[appt.status]}</dd>
+        </div>
+      </dl>
+    </Modal>
+  )
+}
+
 export function TodaysAppointments() {
+  const [selectedId, setSelectedId] = useState(null)
+  const selected = TODAYS_APPOINTMENTS.find((appt) => appt.id === selectedId)
+
   return (
     <section className="card appointments" aria-labelledby="appointments-title">
       <div className="card-header">
@@ -135,13 +206,23 @@ export function TodaysAppointments() {
         </thead>
         <tbody>
           {TODAYS_APPOINTMENTS.map((appt) => (
-            <tr key={appt.id} className={`appt-row row-${appt.status}`}>
+            <tr
+              key={appt.id}
+              className={`appt-row row-${appt.status}${appt.id === selectedId ? ' is-selected' : ''}`}
+              onClick={() => setSelectedId(appt.id)}
+            >
               <td className="appt-time">{appt.time}</td>
               <td className="appt-client">
                 <span className="avatar" aria-hidden="true">
                   {appt.client.replaceAll('.', '')}
                 </span>
-                <span>Client {appt.client}</span>
+                <button
+                  type="button"
+                  className="appt-open"
+                  aria-label={`View details: ${appt.time}, Client ${appt.client}, ${appt.type}`}
+                >
+                  Client {appt.client}
+                </button>
               </td>
               <td className="appt-session">
                 <span className="appt-type">{appt.type}</span>
@@ -158,6 +239,9 @@ export function TodaysAppointments() {
           ))}
         </tbody>
       </table>
+      <p className="table-hint">Select an appointment to see its details.</p>
+
+      {selected && <AppointmentDetails appt={selected} onClose={() => setSelectedId(null)} />}
     </section>
   )
 }

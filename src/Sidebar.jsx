@@ -63,6 +63,14 @@ export default function Sidebar({ view, open, onClose }) {
       <div className="sidebar-footer">
         <span className="sidebar-footer-title">{PRACTICE_NAME}</span>
         <span>Demo workspace · fictional data</span>
+        <a
+          href="#about"
+          className={view === 'about' ? 'about-link active' : 'about-link'}
+          aria-current={view === 'about' ? 'page' : undefined}
+          onClick={onClose}
+        >
+          About this demo
+        </a>
       </div>
     </aside>
   )
