@@ -2,12 +2,16 @@
 
 export const STORAGE_KEY = 'practice-task-tracker.tasks'
 
+export const PRIORITIES = ['high', 'medium', 'low']
+export const DEFAULT_PRIORITY = 'medium'
+export const PRIORITY_LABELS = { high: 'High', medium: 'Medium', low: 'Low' }
+
 export const EXAMPLE_TASKS = [
-  { id: 'example-1', title: 'Renew professional liability insurance', completed: false },
-  { id: 'example-2', title: 'Update intake form template', completed: true },
-  { id: 'example-3', title: 'Order printer paper and toner', completed: false },
-  { id: 'example-4', title: 'Review monthly billing summary', completed: false },
-  { id: 'example-5', title: 'Schedule continuing education course', completed: true },
+  { id: 'example-1', title: 'Renew professional liability insurance', completed: false, priority: 'high' },
+  { id: 'example-2', title: 'Update intake form template', completed: true, priority: 'medium' },
+  { id: 'example-3', title: 'Order printer paper and toner', completed: false, priority: 'low' },
+  { id: 'example-4', title: 'Review monthly billing summary', completed: false, priority: 'medium' },
+  { id: 'example-5', title: 'Schedule continuing education course', completed: true, priority: 'low' },
 ]
 
 export function completionPercent(tasks) {
@@ -16,8 +20,22 @@ export function completionPercent(tasks) {
   return Math.round((done / tasks.length) * 100)
 }
 
-export function createTask(title) {
-  return { id: crypto.randomUUID(), title: title.trim(), completed: false }
+export function isPriority(value) {
+  return PRIORITIES.includes(value)
+}
+
+export function createTask(title, priority = DEFAULT_PRIORITY) {
+  return {
+    id: crypto.randomUUID(),
+    title: title.trim(),
+    completed: false,
+    priority: isPriority(priority) ? priority : DEFAULT_PRIORITY,
+  }
+}
+
+// Tasks saved before priorities existed (or with an unknown value) get the default priority.
+function withPriority(task) {
+  return isPriority(task.priority) ? task : { ...task, priority: DEFAULT_PRIORITY }
 }
 
 // Returns saved tasks, or the example tasks on first visit or if storage is unreadable.
@@ -26,7 +44,7 @@ export function loadTasks(storage = globalThis.localStorage) {
     const saved = storage.getItem(STORAGE_KEY)
     if (saved === null) return EXAMPLE_TASKS
     const parsed = JSON.parse(saved)
-    return Array.isArray(parsed) ? parsed : EXAMPLE_TASKS
+    return Array.isArray(parsed) ? parsed.map(withPriority) : EXAMPLE_TASKS
   } catch {
     return EXAMPLE_TASKS
   }

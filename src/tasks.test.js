@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { EXAMPLE_TASKS, STORAGE_KEY, completionPercent, createTask, loadTasks, saveTasks } from './tasks.js'
+import {
+  DEFAULT_PRIORITY,
+  EXAMPLE_TASKS,
+  PRIORITIES,
+  STORAGE_KEY,
+  completionPercent,
+  createTask,
+  loadTasks,
+  saveTasks,
+} from './tasks.js'
 
 function memoryStorage(initial = {}) {
   const data = { ...initial }
@@ -29,6 +38,21 @@ describe('createTask', () => {
     expect(task.completed).toBe(false)
     expect(task.id).toBeTruthy()
   })
+
+  it('defaults to medium priority', () => {
+    expect(DEFAULT_PRIORITY).toBe('medium')
+    expect(createTask('Call landlord').priority).toBe('medium')
+  })
+
+  it('accepts each priority level', () => {
+    for (const priority of PRIORITIES) {
+      expect(createTask('Task', priority).priority).toBe(priority)
+    }
+  })
+
+  it('falls back to medium for an unknown priority', () => {
+    expect(createTask('Task', 'urgent').priority).toBe('medium')
+  })
 })
 
 describe('loadTasks / saveTasks', () => {
@@ -41,9 +65,40 @@ describe('loadTasks / saveTasks', () => {
     saveTasks([], storage)
     expect(loadTasks(storage)).toEqual([])
 
-    const tasks = [{ id: 'a', title: 'Test', completed: true }]
+    const tasks = [{ id: 'a', title: 'Test', completed: true, priority: 'high' }]
     saveTasks(tasks, storage)
     expect(loadTasks(storage)).toEqual(tasks)
+  })
+
+  it('round-trips priorities, including a changed one', () => {
+    const storage = memoryStorage()
+    const tasks = [
+      { id: 'a', title: 'First', completed: false, priority: 'high' },
+      { id: 'b', title: 'Second', completed: true, priority: 'low' },
+    ]
+    saveTasks(tasks, storage)
+    const changed = loadTasks(storage).map((task) => (task.id === 'a' ? { ...task, priority: 'low' } : task))
+    saveTasks(changed, storage)
+    expect(loadTasks(storage).map((task) => task.priority)).toEqual(['low', 'low'])
+  })
+
+  it('gives medium priority to tasks saved before priorities existed', () => {
+    const storage = memoryStorage({
+      [STORAGE_KEY]: JSON.stringify([
+        { id: 'old', title: 'Saved in version 1', completed: true },
+        { id: 'odd', title: 'Unknown priority', completed: false, priority: 'urgent' },
+      ]),
+    })
+    expect(loadTasks(storage)).toEqual([
+      { id: 'old', title: 'Saved in version 1', completed: true, priority: 'medium' },
+      { id: 'odd', title: 'Unknown priority', completed: false, priority: 'medium' },
+    ])
+  })
+
+  it('gives every example task a valid priority', () => {
+    for (const task of EXAMPLE_TASKS) {
+      expect(PRIORITIES).toContain(task.priority)
+    }
   })
 
   it('falls back to examples when saved data is corrupt', () => {

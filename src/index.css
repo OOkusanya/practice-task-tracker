@@ -196,3 +196,67 @@ button {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+.priority {
+  flex-shrink: 0;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.add-form .priority {
+  font-size: 1rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.priority:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.priority-high {
+  background: #fbeeed;
+  border-color: #e4b5b0;
+  color: var(--danger);
+}
+
+.priority-medium {
+  background: #fdf5e4;
+  border-color: #e8d3a3;
+  color: #8a6212;
+}
+
+.priority-low {
+  background: #eaf3f1;
+  border-color: #b9d5cf;
+  color: var(--accent-dark);
+}
+
+/* On narrow screens, give task text the full width and put the controls on their own line. */
+@media (max-width: 480px) {
+  .add-form {
+    flex-wrap: wrap;
+  }
+
+  .add-form input {
+    flex-basis: 100%;
+  }
+
+  .add-form .priority {
+    flex: 1;
+  }
+
+  .task {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .task-label {
+    flex-basis: 100%;
+  }
+}

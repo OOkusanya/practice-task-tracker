@@ -1,9 +1,26 @@
 import { useEffect, useState } from 'react'
-import { completionPercent, createTask, loadTasks, saveTasks } from './tasks.js'
+import {
+  DEFAULT_PRIORITY,
+  PRIORITIES,
+  PRIORITY_LABELS,
+  completionPercent,
+  createTask,
+  loadTasks,
+  saveTasks,
+} from './tasks.js'
+
+function PriorityOptions() {
+  return PRIORITIES.map((priority) => (
+    <option key={priority} value={priority}>
+      {PRIORITY_LABELS[priority]}
+    </option>
+  ))
+}
 
 export default function App() {
   const [tasks, setTasks] = useState(() => loadTasks())
   const [newTitle, setNewTitle] = useState('')
+  const [newPriority, setNewPriority] = useState(DEFAULT_PRIORITY)
 
   useEffect(() => {
     saveTasks(tasks)
@@ -15,14 +32,19 @@ export default function App() {
   function handleAdd(event) {
     event.preventDefault()
     if (!newTitle.trim()) return
-    setTasks((current) => [...current, createTask(newTitle)])
+    setTasks((current) => [...current, createTask(newTitle, newPriority)])
     setNewTitle('')
+    setNewPriority(DEFAULT_PRIORITY)
   }
 
   function toggleTask(id) {
     setTasks((current) =>
       current.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task)),
     )
+  }
+
+  function changePriority(id, priority) {
+    setTasks((current) => current.map((task) => (task.id === id ? { ...task, priority } : task)))
   }
 
   function deleteTask(id) {
@@ -67,6 +89,17 @@ export default function App() {
           onChange={(event) => setNewTitle(event.target.value)}
           maxLength={120}
         />
+        <label htmlFor="new-task-priority" className="visually-hidden">
+          Priority
+        </label>
+        <select
+          id="new-task-priority"
+          className={`priority priority-${newPriority}`}
+          value={newPriority}
+          onChange={(event) => setNewPriority(event.target.value)}
+        >
+          <PriorityOptions />
+        </select>
         <button type="submit" disabled={!newTitle.trim()}>
           Add
         </button>
@@ -88,6 +121,14 @@ export default function App() {
                 />
                 <span>{task.title}</span>
               </label>
+              <select
+                className={`priority priority-${task.priority}`}
+                value={task.priority}
+                onChange={(event) => changePriority(task.id, event.target.value)}
+                aria-label={`Priority for "${task.title}"`}
+              >
+                <PriorityOptions />
+              </select>
               <button
                 type="button"
                 className="delete"
