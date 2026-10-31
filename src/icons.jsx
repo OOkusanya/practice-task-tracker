@@ -125,3 +125,10 @@ export const CheckIcon = () => (
     <path d="m5 12.5 4.5 4.5L19 7.5" />
   </Icon>
 )
+
+export const ResetIcon = () => (
+  <Icon size={14}>
+    <path d="M3.5 12a8.5 8.5 0 1 0 2.5-6" />
+    <path d="M3.5 3.5V8H8" />
+  </Icon>
+)

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { PlusIcon, TrashIcon } from './icons.jsx'
+import { PlusIcon, ResetIcon, TrashIcon } from './icons.jsx'
 import Modal from './Modal.jsx'
 import {
   DEFAULT_PRIORITY,
@@ -186,12 +186,25 @@ function TaskOverview({ summary, onResetClick }) {
         })}
       </ul>
 
-      <div className="overview-note">
-        <p>Tasks are saved in this browser only.</p>
-        <button type="button" className="link-button" onClick={onResetClick}>
+      <p className="overview-note">Tasks are saved in this browser only.</p>
+
+      <section className="restore" aria-labelledby="restore-title">
+        <h3 id="restore-title" className="restore-title">
+          Restore sample tasks
+        </h3>
+        <p id="restore-help" className="restore-help">
+          Brings back the original sample tasks and priorities, replacing any changes saved in this browser.
+        </p>
+        <button
+          type="button"
+          className="button-secondary button-reset"
+          onClick={onResetClick}
+          aria-describedby="restore-help"
+        >
+          <ResetIcon />
           Reset demo tasks
         </button>
-      </div>
+      </section>
     </aside>
   )
 }
