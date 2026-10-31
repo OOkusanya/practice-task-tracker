@@ -1,40 +1,32 @@
 import { useEffect, useState } from 'react'
-import {
-  DEFAULT_PRIORITY,
-  PRIORITIES,
-  PRIORITY_LABELS,
-  completionPercent,
-  createTask,
-  loadTasks,
-  saveTasks,
-} from './tasks.js'
+import { OverviewCards, PracticeActivity, UpcomingAppointments } from './DashboardWidgets.jsx'
+import { MenuIcon } from './icons.jsx'
+import Sidebar from './Sidebar.jsx'
+import TaskTracker from './TaskTracker.jsx'
+import { PRACTICE_NAME } from './demoData.js'
+import { createTask, loadTasks, saveTasks, taskSummary } from './tasks.js'
 
-function PriorityOptions() {
-  return PRIORITIES.map((priority) => (
-    <option key={priority} value={priority}>
-      {PRIORITY_LABELS[priority]}
-    </option>
-  ))
-}
+const TODAY = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })
 
 export default function App() {
   const [tasks, setTasks] = useState(() => loadTasks())
-  const [newTitle, setNewTitle] = useState('')
-  const [newPriority, setNewPriority] = useState(DEFAULT_PRIORITY)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     saveTasks(tasks)
   }, [tasks])
 
-  const percent = completionPercent(tasks)
-  const doneCount = tasks.filter((task) => task.completed).length
+  useEffect(() => {
+    if (!menuOpen) return
+    const closeOnEscape = (event) => event.key === 'Escape' && setMenuOpen(false)
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [menuOpen])
 
-  function handleAdd(event) {
-    event.preventDefault()
-    if (!newTitle.trim()) return
-    setTasks((current) => [...current, createTask(newTitle, newPriority)])
-    setNewTitle('')
-    setNewPriority(DEFAULT_PRIORITY)
+  const summary = taskSummary(tasks)
+
+  function addTask(title, priority) {
+    setTasks((current) => [...current, createTask(title, priority)])
   }
 
   function toggleTask(id) {
@@ -52,95 +44,53 @@ export default function App() {
   }
 
   return (
-    <main className="app">
-      <header>
-        <h1>Practice Task Tracker</h1>
-        <p className="subtitle">Administrative to-dos for your practice</p>
-      </header>
+    <div className="layout">
+      <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
+      {menuOpen && <div className="scrim" onClick={() => setMenuOpen(false)} aria-hidden="true" />}
 
-      <section className="progress" aria-label="Completion progress">
-        <div className="progress-text">
-          <span className="progress-percent">{percent}%</span>
-          <span>
-            {doneCount} of {tasks.length} tasks complete
-          </span>
-        </div>
-        <div
-          className="progress-bar"
-          role="progressbar"
-          aria-valuenow={percent}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label="Tasks completed"
-        >
-          <div className="progress-fill" style={{ width: `${percent}%` }} />
-        </div>
-      </section>
+      <div className="main">
+        <header className="topbar">
+          <button
+            type="button"
+            className="icon-button menu-button"
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            aria-controls="sidebar"
+          >
+            <MenuIcon />
+          </button>
+          <div className="topbar-title">
+            <span className="topbar-practice">{PRACTICE_NAME}</span>
+            <h1>Dashboard</h1>
+          </div>
+          <span className="topbar-date">{TODAY}</span>
+        </header>
 
-      <form className="add-form" onSubmit={handleAdd}>
-        <label htmlFor="new-task" className="visually-hidden">
-          New task
-        </label>
-        <input
-          id="new-task"
-          type="text"
-          placeholder="Add an administrative task…"
-          value={newTitle}
-          onChange={(event) => setNewTitle(event.target.value)}
-          maxLength={120}
-        />
-        <label htmlFor="new-task-priority" className="visually-hidden">
-          Priority
-        </label>
-        <select
-          id="new-task-priority"
-          className={`priority priority-${newPriority}`}
-          value={newPriority}
-          onChange={(event) => setNewPriority(event.target.value)}
-        >
-          <PriorityOptions />
-        </select>
-        <button type="submit" disabled={!newTitle.trim()}>
-          Add
-        </button>
-      </form>
+        <main id="dashboard" className="content">
+          <p className="demo-banner">
+            <strong>Product demo.</strong> Appointments, clients, billing, and activity are fictional sample data.
+            Practice Tasks are fully working and saved in this browser.
+          </p>
 
-      <p className="privacy-note">Do not enter patient names or other identifying information.</p>
+          <OverviewCards summary={summary} />
 
-      {tasks.length === 0 ? (
-        <p className="empty">No tasks yet. Add one above.</p>
-      ) : (
-        <ul className="task-list">
-          {tasks.map((task) => (
-            <li key={task.id} className={task.completed ? 'task done' : 'task'}>
-              <label className="task-label">
-                <input
-                  type="checkbox"
-                  checked={task.completed}
-                  onChange={() => toggleTask(task.id)}
-                />
-                <span>{task.title}</span>
-              </label>
-              <select
-                className={`priority priority-${task.priority}`}
-                value={task.priority}
-                onChange={(event) => changePriority(task.id, event.target.value)}
-                aria-label={`Priority for "${task.title}"`}
-              >
-                <PriorityOptions />
-              </select>
-              <button
-                type="button"
-                className="delete"
-                onClick={() => deleteTask(task.id)}
-                aria-label={`Delete "${task.title}"`}
-              >
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </main>
+          <div className="dashboard-grid">
+            <TaskTracker
+              tasks={tasks}
+              summary={summary}
+              onAdd={addTask}
+              onToggle={toggleTask}
+              onChangePriority={changePriority}
+              onDelete={deleteTask}
+            />
+            <div className="side-column">
+              <UpcomingAppointments />
+              <PracticeActivity />
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
   )
 }

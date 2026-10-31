@@ -57,3 +57,15 @@ export function saveTasks(tasks, storage = globalThis.localStorage) {
     // Storage may be full or blocked (e.g. private browsing); the app still works for this session.
   }
 }
+
+// Counts for the dashboard's Task Completion card.
+export function taskSummary(tasks) {
+  const open = tasks.filter((task) => !task.completed)
+  return {
+    total: tasks.length,
+    done: tasks.length - open.length,
+    open: open.length,
+    openHighPriority: open.filter((task) => task.priority === 'high').length,
+    percent: completionPercent(tasks),
+  }
+}

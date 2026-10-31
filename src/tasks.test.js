@@ -8,6 +8,7 @@ import {
   createTask,
   loadTasks,
   saveTasks,
+  taskSummary,
 } from './tasks.js'
 
 function memoryStorage(initial = {}) {
@@ -28,6 +29,22 @@ describe('completionPercent', () => {
   it('rounds to a whole percent', () => {
     const tasks = [{ completed: true }, { completed: false }, { completed: false }]
     expect(completionPercent(tasks)).toBe(33)
+  })
+})
+
+describe('taskSummary', () => {
+  it('counts done, open, and open high-priority tasks', () => {
+    const tasks = [
+      { completed: true, priority: 'high' },
+      { completed: false, priority: 'high' },
+      { completed: false, priority: 'low' },
+      { completed: true, priority: 'medium' },
+    ]
+    expect(taskSummary(tasks)).toEqual({ total: 4, done: 2, open: 2, openHighPriority: 1, percent: 50 })
+  })
+
+  it('handles an empty list', () => {
+    expect(taskSummary([])).toEqual({ total: 0, done: 0, open: 0, openHighPriority: 0, percent: 0 })
   })
 })
 
