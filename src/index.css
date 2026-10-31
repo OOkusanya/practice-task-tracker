@@ -24,13 +24,12 @@
   --sidebar-width: 232px;
   --topbar-height: 56px;
 
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  font-size: 14px;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13.5px;
   line-height: 1.45;
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
-  font-feature-settings: 'cv11', 'ss01';
 }
 
 * {
@@ -46,7 +45,7 @@ h1,
 h2 {
   margin: 0;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 button,
@@ -119,8 +118,8 @@ a {
 }
 
 .brand-name {
-  font-weight: 650;
-  font-size: 15px;
+  font-weight: 600;
+  font-size: 14.5px;
   letter-spacing: -0.01em;
 }
 
@@ -226,7 +225,7 @@ a.nav-item:hover {
 }
 
 .topbar h1 {
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .topbar-date {
@@ -261,7 +260,7 @@ a.nav-item:hover {
 
 /* Content */
 .content {
-  max-width: 1240px;
+  max-width: 1280px;
   padding: 20px 28px 40px;
   display: flex;
   flex-direction: column;
@@ -300,12 +299,12 @@ a.nav-item:hover {
 }
 
 .card-header h2 {
-  font-size: 14.5px;
+  font-size: 14px;
 }
 
 .card-sub {
   margin: 2px 0 0;
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--text-muted);
 }
 
@@ -365,13 +364,13 @@ a.nav-item:hover {
 }
 
 .stat-label {
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--text-muted);
   font-weight: 500;
 }
 
 .stat-value {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -382,35 +381,12 @@ a.nav-item:hover {
   color: var(--text-muted);
 }
 
-.stat-link:hover {
-  border-color: var(--border-strong);
-}
-
 .stat-bar {
   height: 4px;
   margin: 2px 0 2px;
   background: #efede7;
   border-radius: 999px;
   overflow: hidden;
-}
-
-/* Main grid */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
-  gap: 16px;
-  align-items: start;
-}
-
-.side-column {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-width: 0;
-}
-
-#tasks {
-  scroll-margin-top: calc(var(--topbar-height) + 16px);
 }
 
 /* Tasks */
@@ -621,21 +597,6 @@ a.nav-item:hover {
   border-top: 1px solid var(--border);
 }
 
-.appt {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 0;
-}
-
-.appt-time {
-  width: 62px;
-  flex-shrink: 0;
-  font-size: 12.5px;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-}
-
 .avatar {
   display: grid;
   place-items: center;
@@ -649,14 +610,12 @@ a.nav-item:hover {
   font-weight: 600;
 }
 
-.appt-body,
 .activity-body {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
-.appt-title,
 .activity-text {
   font-size: 13px;
   font-weight: 500;
@@ -669,10 +628,6 @@ a.nav-item:hover {
   gap: 4px;
   font-size: 12px;
   color: var(--text-muted);
-}
-
-.appt-meta svg {
-  flex-shrink: 0;
 }
 
 .activity {
@@ -720,14 +675,194 @@ a.nav-item:hover {
   white-space: nowrap;
 }
 
+/* Today's Appointments */
+.appointments {
+  padding-bottom: 6px;
+}
+
+.appt-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.appt-table th {
+  padding: 0 12px 8px 0;
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--border);
+}
+
+.appt-table td {
+  padding: 10px 12px 10px 0;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+}
+
+.appt-table th:last-child,
+.appt-table td:last-child {
+  padding-right: 0;
+}
+
+.appt-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.appt-table tbody tr:hover {
+  background: var(--surface-muted);
+}
+
+.appt-time {
+  width: 84px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.appt-client {
+  white-space: nowrap;
+}
+
+.appt-client .avatar {
+  display: inline-grid;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.appt-type {
+  display: block;
+  font-weight: 500;
+}
+
+.appt-meta svg {
+  flex-shrink: 0;
+}
+
+.appt-clinician {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.appt-status,
+.appt-table th:last-child {
+  width: 1%;
+  text-align: right;
+}
+
+.is-past .appt-time,
+.is-past .appt-client,
+.is-past .appt-type {
+  color: var(--text-muted);
+}
+
+.status {
+  display: inline-block;
+  padding: 1px 8px;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: var(--surface);
+}
+
+.status-completed {
+  background: var(--surface-muted);
+  color: var(--text-faint);
+}
+
+.status-in-session {
+  background: var(--sage-soft);
+  border-color: #d3e0d6;
+  color: var(--sage-strong);
+}
+
+.status-checked-in {
+  background: #eef1f5;
+  border-color: #d9dfe8;
+  color: var(--navy);
+}
+
+.status-unconfirmed {
+  background: var(--amber-soft);
+  border-color: #eedfbe;
+  color: var(--amber);
+}
+
+/* Supporting widgets */
+.support-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.support-grid .progress-bar {
+  height: 4px;
+  margin-bottom: 4px;
+}
+
+.mini-task {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.mini-task .task-label span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.priority-tag {
+  flex-shrink: 0;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid;
+  border-radius: 999px;
+}
+
+.widget-empty {
+  margin: 0;
+  padding: 18px 0 8px;
+  color: var(--text-muted);
+  font-size: 12.5px;
+}
+
+.widget-link {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--sage-strong);
+}
+
+.widget-link:hover {
+  text-decoration: underline;
+}
+
+.content-narrow {
+  max-width: 820px;
+}
+
 /* Responsive */
 @media (max-width: 1180px) {
   .overview {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
 
-  .dashboard-grid {
+@media (max-width: 960px) {
+  .support-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .appt-clinician {
+    white-space: normal;
   }
 }
 
@@ -773,6 +908,77 @@ a.nav-item:hover {
   }
 }
 
+/* Phones: each appointment becomes a compact two-line row. */
+@media (max-width: 640px) {
+  .appt-table thead {
+    display: none;
+  }
+
+  .appt-table,
+  .appt-table tbody {
+    display: block;
+  }
+
+  .appt-table tbody tr {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'time client status'
+      'time session session'
+      'time clinician clinician';
+    column-gap: 10px;
+    row-gap: 2px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .appt-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .appt-table td {
+    display: block;
+    padding: 0;
+    border: none;
+  }
+
+  .appt-time {
+    grid-area: time;
+    width: auto;
+  }
+
+  .appt-client {
+    grid-area: client;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .appt-client .avatar {
+    display: none;
+  }
+
+  .appt-session {
+    grid-area: session;
+  }
+
+  .appt-session .appt-type {
+    font-weight: 400;
+    color: var(--text-muted);
+    font-size: 12.5px;
+  }
+
+  .appt-clinician {
+    grid-area: clinician;
+    font-size: 12px;
+  }
+
+  .appt-status {
+    grid-area: status;
+    width: auto;
+  }
+}
+
 @media (max-width: 520px) {
   .topbar-date {
     display: none;
@@ -793,7 +999,7 @@ a.nav-item:hover {
   }
 
   .stat-value {
-    font-size: 19px;
+    font-size: 18px;
   }
 
   .add-form {
@@ -810,23 +1016,5 @@ a.nav-item:hover {
 
   .task {
     gap: 8px;
-  }
-
-  .appt {
-    align-items: flex-start;
-  }
-
-  .appt .avatar {
-    display: none;
-  }
-
-  .appt-time {
-    width: 64px;
-    padding-top: 1px;
-    white-space: nowrap;
-  }
-
-  .appt-meta {
-    flex-wrap: wrap;
   }
 }

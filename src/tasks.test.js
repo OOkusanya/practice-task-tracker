@@ -7,6 +7,7 @@ import {
   completionPercent,
   createTask,
   loadTasks,
+  openTasksByPriority,
   saveTasks,
   taskSummary,
 } from './tasks.js'
@@ -45,6 +46,24 @@ describe('taskSummary', () => {
 
   it('handles an empty list', () => {
     expect(taskSummary([])).toEqual({ total: 0, done: 0, open: 0, openHighPriority: 0, percent: 0 })
+  })
+})
+
+describe('openTasksByPriority', () => {
+  const tasks = [
+    { id: 'a', completed: false, priority: 'low' },
+    { id: 'b', completed: true, priority: 'high' },
+    { id: 'c', completed: false, priority: 'medium' },
+    { id: 'd', completed: false, priority: 'high' },
+    { id: 'e', completed: false, priority: 'medium' },
+  ]
+
+  it('lists open tasks from high to low, keeping order within a priority', () => {
+    expect(openTasksByPriority(tasks).map((task) => task.id)).toEqual(['d', 'c', 'e', 'a'])
+  })
+
+  it('respects the limit', () => {
+    expect(openTasksByPriority(tasks, 2).map((task) => task.id)).toEqual(['d', 'c'])
   })
 })
 

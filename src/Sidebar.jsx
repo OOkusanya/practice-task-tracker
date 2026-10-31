@@ -20,7 +20,7 @@ const NAV_ITEMS = [
   { id: 'settings', label: 'Settings', Icon: SettingsIcon },
 ]
 
-export default function Sidebar({ open, onClose }) {
+export default function Sidebar({ view, open, onClose }) {
   return (
     <aside id="sidebar" className={open ? 'sidebar open' : 'sidebar'} aria-label="Main">
       <div className="brand">
@@ -41,8 +41,8 @@ export default function Sidebar({ open, onClose }) {
               {href ? (
                 <a
                   href={href}
-                  className={id === 'dashboard' ? 'nav-item active' : 'nav-item'}
-                  aria-current={id === 'dashboard' ? 'page' : undefined}
+                  className={id === view ? 'nav-item active' : 'nav-item'}
+                  aria-current={id === view ? 'page' : undefined}
                   onClick={onClose}
                 >
                   <Icon />

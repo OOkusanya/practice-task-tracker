@@ -69,3 +69,11 @@ export function taskSummary(tasks) {
     percent: completionPercent(tasks),
   }
 }
+
+// Open tasks, highest priority first (original order kept within a priority), for the dashboard widget.
+export function openTasksByPriority(tasks, limit = Infinity) {
+  return tasks
+    .filter((task) => !task.completed)
+    .toSorted((a, b) => PRIORITIES.indexOf(a.priority) - PRIORITIES.indexOf(b.priority))
+    .slice(0, limit)
+}

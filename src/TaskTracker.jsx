@@ -23,10 +23,10 @@ export default function TaskTracker({ tasks, summary, onAdd, onToggle, onChangeP
   }
 
   return (
-    <section id="tasks" className="card tasks-card" aria-labelledby="tasks-title">
+    <section className="card tasks-card" aria-labelledby="tasks-title">
       <div className="card-header">
         <div>
-          <h2 id="tasks-title">Practice Tasks</h2>
+          <h2 id="tasks-title">All Tasks</h2>
           <p className="card-sub">Administrative to-dos · saved in this browser</p>
         </div>
         <span className="pill pill-live">Live</span>
