@@ -9,7 +9,7 @@ import { MenuIcon } from './icons.jsx'
 import Sidebar from './Sidebar.jsx'
 import TaskTracker from './TaskTracker.jsx'
 import { PRACTICE_NAME } from './demoData.js'
-import { createTask, loadTasks, saveTasks, taskSummary } from './tasks.js'
+import { createTask, loadTasks, saveTasks, taskSummary, titleError } from './tasks.js'
 
 const TODAY = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })
 
@@ -55,6 +55,7 @@ export default function App() {
   const summary = taskSummary(tasks)
 
   function addTask(title, priority) {
+    if (titleError(title)) return
     setTasks((current) => [...current, createTask(title, priority)])
   }
 
@@ -97,7 +98,7 @@ export default function App() {
         </header>
 
         {view === 'tasks' ? (
-          <main className="content content-narrow">
+          <main className="content">
             <TaskTracker
               tasks={tasks}
               summary={summary}

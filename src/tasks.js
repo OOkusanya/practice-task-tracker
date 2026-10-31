@@ -6,6 +6,21 @@ export const PRIORITIES = ['high', 'medium', 'low']
 export const DEFAULT_PRIORITY = 'medium'
 export const PRIORITY_LABELS = { high: 'High', medium: 'Medium', low: 'Low' }
 
+export const TITLE_MAX_LENGTH = 120
+
+// Length as a person would count it: surrounding spaces ignored, an emoji counts as one character.
+export function titleLength(title) {
+  return [...title.trim()].length
+}
+
+// Returns null when the title can be saved, otherwise 'empty' or 'too-long'.
+export function titleError(title) {
+  const length = titleLength(title)
+  if (length === 0) return 'empty'
+  if (length > TITLE_MAX_LENGTH) return 'too-long'
+  return null
+}
+
 export const EXAMPLE_TASKS = [
   { id: 'example-1', title: 'Renew professional liability insurance', completed: false, priority: 'high' },
   { id: 'example-2', title: 'Update intake form template', completed: true, priority: 'medium' },
@@ -66,6 +81,9 @@ export function taskSummary(tasks) {
     done: tasks.length - open.length,
     open: open.length,
     openHighPriority: open.filter((task) => task.priority === 'high').length,
+    openByPriority: Object.fromEntries(
+      PRIORITIES.map((priority) => [priority, open.filter((task) => task.priority === priority).length]),
+    ),
     percent: completionPercent(tasks),
   }
 }

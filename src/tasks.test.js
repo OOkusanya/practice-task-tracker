@@ -4,12 +4,15 @@ import {
   EXAMPLE_TASKS,
   PRIORITIES,
   STORAGE_KEY,
+  TITLE_MAX_LENGTH,
   completionPercent,
   createTask,
   loadTasks,
   openTasksByPriority,
   saveTasks,
   taskSummary,
+  titleError,
+  titleLength,
 } from './tasks.js'
 
 function memoryStorage(initial = {}) {
@@ -41,11 +44,48 @@ describe('taskSummary', () => {
       { completed: false, priority: 'low' },
       { completed: true, priority: 'medium' },
     ]
-    expect(taskSummary(tasks)).toEqual({ total: 4, done: 2, open: 2, openHighPriority: 1, percent: 50 })
+    expect(taskSummary(tasks)).toEqual({
+      total: 4,
+      done: 2,
+      open: 2,
+      openHighPriority: 1,
+      openByPriority: { high: 1, medium: 0, low: 1 },
+      percent: 50,
+    })
   })
 
   it('handles an empty list', () => {
-    expect(taskSummary([])).toEqual({ total: 0, done: 0, open: 0, openHighPriority: 0, percent: 0 })
+    expect(taskSummary([])).toEqual({
+      total: 0,
+      done: 0,
+      open: 0,
+      openHighPriority: 0,
+      openByPriority: { high: 0, medium: 0, low: 0 },
+      percent: 0,
+    })
+  })
+})
+
+describe('task title rules', () => {
+  it('allows up to 120 characters', () => {
+    expect(TITLE_MAX_LENGTH).toBe(120)
+    expect(titleError('A'.repeat(120))).toBeNull()
+  })
+
+  it('rejects 121 or more characters instead of trimming them', () => {
+    expect(titleError('A'.repeat(121))).toBe('too-long')
+    expect(titleError('A'.repeat(130))).toBe('too-long')
+  })
+
+  it('rejects empty or space-only titles', () => {
+    expect(titleError('')).toBe('empty')
+    expect(titleError('   ')).toBe('empty')
+  })
+
+  it('ignores surrounding spaces and counts an emoji as one character', () => {
+    expect(titleLength('  Call landlord  ')).toBe(13)
+    expect(titleLength('Order 📦')).toBe(7)
+    expect(titleError(`  ${'A'.repeat(120)}  `)).toBeNull()
   })
 })
 

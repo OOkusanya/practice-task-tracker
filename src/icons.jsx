@@ -106,3 +106,22 @@ export const PinIcon = () => (
     <circle cx="12" cy="10" r="2.3" />
   </Icon>
 )
+
+export const PlusIcon = () => (
+  <Icon size={15}>
+    <path d="M12 5v14M5 12h14" />
+  </Icon>
+)
+
+export const AlertIcon = () => (
+  <Icon size={12}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7.5v5.5M12 16.5v.01" />
+  </Icon>
+)
+
+export const CheckIcon = () => (
+  <Icon size={12}>
+    <path d="m5 12.5 4.5 4.5L19 7.5" />
+  </Icon>
+)

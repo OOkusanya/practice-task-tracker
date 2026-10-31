@@ -1,11 +1,12 @@
 import {
   APPOINTMENT_STATUSES,
-  OTHER_STATS,
+  CLIENT_STATS,
+  INVOICE_STATS,
   PRACTICE_ACTIVITY,
   TODAYS_APPOINTMENTS,
   appointmentSummary,
 } from './demoData.js'
-import { PinIcon, VideoIcon } from './icons.jsx'
+import { AlertIcon, CheckIcon, PinIcon, VideoIcon } from './icons.jsx'
 import { PRIORITY_LABELS, openTasksByPriority } from './tasks.js'
 
 const APPOINTMENTS = appointmentSummary(TODAYS_APPOINTMENTS)
@@ -22,42 +23,86 @@ function LivePill() {
   return <span className="pill pill-live">Live</span>
 }
 
-function StatCard({ label, value, detail, live = false, children }) {
+// One "Demo data" label covers the whole summary row; only Task Completion is live.
+export function OverviewCards({ summary }) {
   return (
-    <div className="card stat">
-      <div className="stat-top">
-        <span className="stat-label">{label}</span>
-        {live ? <LivePill /> : <DemoPill />}
+    <section className="overview-section" aria-labelledby="overview-title">
+      <div className="section-head">
+        <h2 id="overview-title">At a glance</h2>
+        <span className="section-note">
+          <DemoPill /> Sample figures, except Task Completion
+        </span>
       </div>
-      <span className="stat-value">{value}</span>
-      {children}
-      <span className="stat-detail">{detail}</span>
-    </div>
+
+      <div className="overview">
+        <div className="card stat stat-feature">
+          <span className="stat-label">Today&apos;s Appointments</span>
+          <span className="stat-value">{APPOINTMENTS.total}</span>
+          <span className="stat-detail">
+            {APPOINTMENTS.inPerson} in person · {APPOINTMENTS.telehealth} telehealth
+          </span>
+          <div className="stat-breakdown">
+            <span>
+              <strong>{APPOINTMENTS.completed}</strong> completed
+            </span>
+            <span>
+              <strong>{APPOINTMENTS.inSession}</strong> in session
+            </span>
+            <span>
+              <strong>{APPOINTMENTS.upcoming}</strong> upcoming
+            </span>
+            {APPOINTMENTS.unconfirmed > 0 && (
+              <span className="feature-flag">
+                <AlertIcon />
+                {APPOINTMENTS.unconfirmed} unconfirmed
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="card stat">
+          <span className="stat-label">Active Clients</span>
+          <span className="stat-value">{CLIENT_STATS.active}</span>
+          <span className="stat-detail">+{CLIENT_STATS.newThisMonth} new this month</span>
+        </div>
+
+        <div className="card stat">
+          <span className="stat-label">Outstanding Invoices</span>
+          <span className="stat-value">{INVOICE_STATS.outstanding}</span>
+          <span className="stat-detail">{INVOICE_STATS.count} invoices</span>
+          <span className="overdue-flag">
+            <AlertIcon />
+            {INVOICE_STATS.overdueCount} overdue · {INVOICE_STATS.overdueAmount}
+          </span>
+        </div>
+
+        <a href="#tasks" className="card stat stat-link">
+          <div className="stat-top">
+            <span className="stat-label">Task Completion</span>
+            <LivePill />
+          </div>
+          <span className="stat-value">{summary.percent}%</span>
+          <div className="stat-bar" aria-hidden="true">
+            <div className="progress-fill" style={{ width: `${summary.percent}%` }} />
+          </div>
+          <span className="stat-detail">
+            {summary.open} open · {summary.openHighPriority} high priority
+          </span>
+        </a>
+      </div>
+    </section>
   )
 }
 
-export function OverviewCards({ summary }) {
+const STATUS_ICONS = { completed: CheckIcon, unconfirmed: AlertIcon }
+
+function StatusBadge({ status }) {
+  const StatusIcon = STATUS_ICONS[status]
   return (
-    <section className="overview" aria-label="Practice overview">
-      <StatCard
-        label="Today's Appointments"
-        value={APPOINTMENTS.total}
-        detail={`${APPOINTMENTS.inPerson} in person · ${APPOINTMENTS.telehealth} telehealth`}
-      />
-      {OTHER_STATS.map((stat) => (
-        <StatCard key={stat.id} label={stat.label} value={stat.value} detail={stat.detail} />
-      ))}
-      <StatCard
-        label="Task Completion"
-        value={`${summary.percent}%`}
-        detail={`${summary.open} open · ${summary.openHighPriority} high priority`}
-        live
-      >
-        <div className="stat-bar" aria-hidden="true">
-          <div className="progress-fill" style={{ width: `${summary.percent}%` }} />
-        </div>
-      </StatCard>
-    </section>
+    <span className={`status status-${status}`}>
+      {StatusIcon ? <StatusIcon /> : <span className="status-dot" aria-hidden="true" />}
+      {APPOINTMENT_STATUSES[status]}
+    </span>
   )
 }
 
@@ -70,6 +115,9 @@ export function TodaysAppointments() {
           <p className="card-sub">
             {APPOINTMENTS.total} sessions · {APPOINTMENTS.completed} completed · {APPOINTMENTS.inSession} in
             session · {APPOINTMENTS.upcoming} upcoming
+            {APPOINTMENTS.unconfirmed > 0 && (
+              <span className="sub-alert"> · {APPOINTMENTS.unconfirmed} awaiting confirmation</span>
+            )}
           </p>
         </div>
         <DemoPill />
@@ -87,7 +135,7 @@ export function TodaysAppointments() {
         </thead>
         <tbody>
           {TODAYS_APPOINTMENTS.map((appt) => (
-            <tr key={appt.id} className={appt.status === 'completed' ? 'is-past' : undefined}>
+            <tr key={appt.id} className={`appt-row row-${appt.status}`}>
               <td className="appt-time">{appt.time}</td>
               <td className="appt-client">
                 <span className="avatar" aria-hidden="true">
@@ -104,7 +152,7 @@ export function TodaysAppointments() {
               </td>
               <td className="appt-clinician">{appt.clinician}</td>
               <td className="appt-status">
-                <span className={`status status-${appt.status}`}>{APPOINTMENT_STATUSES[appt.status]}</span>
+                <StatusBadge status={appt.status} />
               </td>
             </tr>
           ))}

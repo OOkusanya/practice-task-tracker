@@ -32,13 +32,13 @@ export function appointmentSummary(appointments) {
     completed: count((appt) => appt.status === 'completed'),
     inSession: count((appt) => appt.status === 'in-session'),
     upcoming: count((appt) => appt.status !== 'completed' && appt.status !== 'in-session'),
+    unconfirmed: count((appt) => appt.status === 'unconfirmed'),
   }
 }
 
-export const OTHER_STATS = [
-  { id: 'clients', label: 'Active Clients', value: '64', detail: '+3 new this month' },
-  { id: 'invoices', label: 'Outstanding Invoices', value: '$2,340', detail: '7 invoices · 2 overdue' },
-]
+export const CLIENT_STATS = { active: 64, newThisMonth: 3 }
+
+export const INVOICE_STATS = { outstanding: '$2,340', count: 7, overdueCount: 2, overdueAmount: '$860' }
 
 export const PRACTICE_ACTIVITY = [
   { id: 'act-1', kind: 'billing', text: 'Invoice #1042 paid', detail: '$180.00 · Card', time: '12 min ago' },

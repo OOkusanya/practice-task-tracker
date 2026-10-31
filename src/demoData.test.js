@@ -10,6 +10,7 @@ describe('appointmentSummary', () => {
       completed: 2,
       inSession: 1,
       upcoming: 5,
+      unconfirmed: 1,
     })
   })
 
